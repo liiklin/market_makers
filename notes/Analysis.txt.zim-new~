@@ -1,0 +1,21 @@
+Content-Type: text/x-zim-wiki
+Wiki-Format: zim 0.4
+Creation-Date: 2016-11-03T12:33:31-05:00
+
+====== Analysis ======
+Created Thursday 03 November 2016
+
+==== Data Inputs ====
+* Price
+* Volume
+* [[TimeSeriesBins]]
+	* extract TS from gdax data - performed by a 2 step map/reduce to first extract the time series data (map) and then produce the intended bins which are saved to gdax_11-16_btc_bins.json
+		* cat gdax_11-16_btc.csv |  [[./map_time_series.py]] | [[./reduce_ts_bins.py]]
+
+==== Functions ====
+* MovingAverage - avg(set,idx,size)
+* FirstDerivative - dt(set,idx,size)
+* [[TimeSeriesBins]] - bin(start,end,size)
+
+==== Data Outputs ====
+
