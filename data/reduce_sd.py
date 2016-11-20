@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-import sys
 import numpy as np
+import sys,os,argparse
 
 def get_args():
     parser = argparse.ArgumentParser(description='Generate equally spaced bins from the set provided in the stdin')
