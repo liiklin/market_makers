@@ -1,8 +1,7 @@
 #!/usr/bin/env python
-
+from __future__ import division
 import sys
 import datetime
-from __future__ import division
 from datetime import datetime, timedelta
 
 class TimeStamp:
