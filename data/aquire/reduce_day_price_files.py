@@ -34,7 +34,7 @@ def process_lines():
         else:
             if date >= end:
                 if len(file_lines) > 10:
-                    save_to("/market_maker/daily_price/%s.csv" % str(ts.totimestamp(current_day)),file_lines)
+                    save_to("%s.csv" % str(ts.totimestamp(current_day)),file_lines)
                 del file_lines 
                 file_lines=[]           
                 # set the next file date
@@ -42,7 +42,7 @@ def process_lines():
                 end = current_day + timedelta(days=1)
         file_lines.append("%s,%s" % (str(ts.totimestamp(date)),str(price)))
     if len(file_lines) > 10:
-        save_to("/market_maker/daily_price/%s.csv" % str(ts.totimestamp(current_day)),file_lines)
+        save_to("%s.csv" % str(ts.totimestamp(current_day)),file_lines)
     del file_lines
 
 if __name__ == "__main__":
