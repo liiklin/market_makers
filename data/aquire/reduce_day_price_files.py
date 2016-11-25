@@ -36,8 +36,8 @@ def process_lines():
         if not dateTs in d[dayTs]:
             d[dayTs][dateTs] = price
     # write the results
-    for currentDayKey,dayDict in d:
-        for currentTimeKey,price in dayDict:
+    for currentDayKey,dayDict in d.iteritems():
+        for currentTimeKey,price in dayDict.iteritems():
             print "%s,%s,%s" % (str(currentDayKey),str(currentTimeKey),str(price))
 
 if __name__ == "__main__":
