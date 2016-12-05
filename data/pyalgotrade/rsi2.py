@@ -3,11 +3,11 @@ from pyalgotrade import strategy
 from pyalgotrade.technical import ma
 from pyalgotrade.technical import rsi
 from pyalgotrade.technical import cross
-
+from pyalgotrade.bitstamp import broker
 
 class RSI2(strategy.BacktestingStrategy):
-    def __init__(self, feed, instrument, entrySMA, exitSMA, rsiPeriod, overBoughtThreshold, overSoldThreshold):
-        super(RSI2, self).__init__(feed)
+    def __init__(self, feed,broker, instrument, entrySMA, exitSMA, rsiPeriod, overBoughtThreshold, overSoldThreshold):
+        super(RSI2, self).__init__(feed,broker)
         self.__instrument = instrument
         # We'll use adjusted close values, if available, instead of regular close values.
         if feed.barsHaveAdjClose():
@@ -37,14 +37,17 @@ class RSI2(strategy.BacktestingStrategy):
             self.__shortPos = None
         else:
             assert(False)
-
-    def onExitOk(self, position):
-        if self.__longPos == position:
-            self.__longPos = None
-        elif self.__shortPos == position:
-            self.__shortPos = None
-        else:
-            assert(False)
+	def onEnterOk(self, position):
+		execInfo = position.getEntryOrder().getExecutionInfo()
+		self.info("BUY at $%.2f" % (execInfo.getPrice()))
+	def onExitOk(self, position):
+		if self.__longPos == position:
+			self.__longPos = None
+		elif self.__shortPos == position:
+			self.__shortPos = None
+		else:
+			assert(False)
+		self.info("SELL at $%.2f" % (execInfo.getPrice()))
 
     def onExitCanceled(self, position):
         # If the exit was canceled, re-submit it.

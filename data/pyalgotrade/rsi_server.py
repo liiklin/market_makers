@@ -1,23 +1,28 @@
 #!/usr/bin/python
 import itertools
-from pyalgotrade.barfeed import yahoofeed
 from pyalgotrade.optimizer import server
-
+from pyalgotrade.barfeed import csvfeed
+from pyalgotrade import bar
 
 def parameters_generator():
     instrument = ["btc"]
-    entrySMA = range(99, 15)
-    exitSMA = range(8, 16)
+    entrySMA = range(120, 170)
+    exitSMA = range(8, 18)
     rsiPeriod = range(2, 4)
-    overBoughtThreshold = range(75, 96)
-    overSoldThreshold = range(16, 26)
+    overBoughtThreshold = range(90, 96)
+    overSoldThreshold = range(19, 29)
     return itertools.product(instrument, entrySMA, exitSMA, rsiPeriod, overBoughtThreshold, overSoldThreshold)
 
 # The if __name__ == '__main__' part is necessary if running on Windows.
 if __name__ == '__main__':
-    # Load the feed from the CSV files.
-    feed = yahoofeed.Feed()
-    feed.addBarsFromCSV("btc", "btc_all_5_min.csv")
+	instrument = "btc"
+	year = "2015"
+	# Load the feed from the CSV files.
+	barFeed = csvfeed.GenericBarFeed(bar.Frequency.MINUTE*30)
+	barFeed.addBarsFromCSV(instrument, "30min-%s-%s.csv" % (instrument,year))
+ 
+    #feed = yahoofeed.Feed()
+	# feed.addBarsFromCSV("btc", "btc_all_daily.csv")
 
     # Run the server.
-    server.serve(feed, parameters_generator(), "localhost", 5000)
+	server.serve(barFeed, parameters_generator(), "0.0.0.0", 5000)
