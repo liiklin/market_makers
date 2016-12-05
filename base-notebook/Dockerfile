@@ -40,6 +40,7 @@ RUN apt-get update -qq && \
         texlive-fonts-recommended \
         texlive-latex-base \
         texlive-latex-extra \
+        vim \
         zlib1g-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*

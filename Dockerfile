@@ -47,6 +47,8 @@ RUN chmod +x ~/start-hadoop.sh && \
     chmod +x ~/run-wordcount.sh && \
     chmod +x $HADOOP_HOME/sbin/start-dfs.sh && \
     chmod +x $HADOOP_HOME/sbin/start-yarn.sh 
+RUN git config --global user.email 'mcstar@gmail.com'
+RUN git config --global user.name 'Schwab'
 
 # Market_maker application code
 RUN git clone https://github.com/schwab/market_makers.git
