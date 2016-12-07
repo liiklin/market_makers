@@ -11,7 +11,8 @@ def parameters_generator():
     rsiPeriod = range(2, 4)
     overBoughtThreshold = range(90, 96)
     overSoldThreshold = range(19, 29)
-    return itertools.product(instrument, entrySMA, exitSMA, rsiPeriod, overBoughtThreshold, overSoldThreshold)
+    initialAmount = [1000]
+    return itertools.product(instrument, entrySMA, exitSMA, rsiPeriod, overBoughtThreshold, overSoldThreshold, initialAmount)
 
 # The if __name__ == '__main__' part is necessary if running on Windows.
 if __name__ == '__main__':

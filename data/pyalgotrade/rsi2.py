@@ -6,8 +6,8 @@ from pyalgotrade.technical import cross
 from pyalgotrade.bitstamp import broker
 
 class RSI2(strategy.BacktestingStrategy):
-    def __init__(self, feed,broker, instrument, entrySMA, exitSMA, rsiPeriod, overBoughtThreshold, overSoldThreshold):
-        super(RSI2, self).__init__(feed,broker)
+    def __init__(self, feed, instrument, entrySMA, exitSMA, rsiPeriod, overBoughtThreshold, overSoldThreshold, amount):
+        super(RSI2, self).__init__(feed)
         self.__instrument = instrument
         # We'll use adjusted close values, if available, instead of regular close values.
         if feed.barsHaveAdjClose():
@@ -17,9 +17,10 @@ class RSI2(strategy.BacktestingStrategy):
         self.__exitSMA = ma.SMA(self.__priceDS, exitSMA)
         self.__rsi = rsi.RSI(self.__priceDS, rsiPeriod)
         self.__overBoughtThreshold = overBoughtThreshold
-        self.__overSoldThreshold = overSoldThreshold
+        self.__overSoldThreshold = overSoldThreshold    
         self.__longPos = None
         self.__shortPos = None
+        self.getBroker().setCash(amount)
 
     def getEntrySMA(self):
         return self.__entrySMA
@@ -57,30 +58,38 @@ class RSI2(strategy.BacktestingStrategy):
         # Wait for enough bars to be available to calculate SMA and RSI.
         if self.__exitSMA[-1] is None or self.__entrySMA[-1] is None or self.__rsi[-1] is None:
             return
-
         bar = bars[self.__instrument]
-        if self.__longPos is not None:
-            if self.exitLongSignal():
-                self.__longPos.exitMarket()
-        elif self.__shortPos is not None:
-            if self.exitShortSignal():
-                self.__shortPos.exitMarket()
-        else:
-            if self.enterLongSignal(bar):
-                shares = int(self.getBroker().getCash() * 0.9 / bars[self.__instrument].getPrice())
-                self.__longPos = self.enterLong(self.__instrument, shares, True)
-            elif self.enterShortSignal(bar):
-                shares = int(self.getBroker().getCash() * 0.9 / bars[self.__instrument].getPrice())
-                self.__shortPos = self.enterShort(self.__instrument, shares, True)
-
+        signals = (self.enterLongSignal(bar), self.exitLongSignal(), self.enterShortSignal(bar), self.exitShortSignal())
+        if self.__longPos is not None and self.__longPos.isOpen() and (signals[1] or signals[2]):
+            # we are long and get a long exit signal
+            print "Position Open: %s Age: %s Return: %s" % (self.__longPos.isOpen(), self.__longPos.getAge(), self.__longPos.getReturn())
+            print "SELL  @ %s $%s signals : %s %s %s %s " % (bars[self.__instrument].getPrice(), self.getBroker().getCash(), signals[0], signals[1], signals[2], signals[3])
+            self.__longPos.exitMarket()
+        elif self.__longPos is None and (signals[0] or signals[3]):
+            # we are short and get a long entry signal
+            shares = int(self.getBroker().getCash() * 0.9 / bars[self.__instrument].getPrice())
+            print "BUY  %s @ %s $%s signals : %s %s %s %s " % (shares, bars[self.__instrument].getPrice(), self.getBroker().getCash(), signals[0], signals[1], signals[2], signals[3])
+            self.__longPos = self.enterLong(self.__instrument, shares, True)
+            
     def enterLongSignal(self, bar):
+        # current price is > last entrySMA and last RSI <= oversold threshold
         return bar.getPrice() > self.__entrySMA[-1] and self.__rsi[-1] <= self.__overSoldThreshold
 
     def exitLongSignal(self):
-        return cross.cross_above(self.__priceDS, self.__exitSMA) and not self.__longPos.exitActive()
+        # price crosses above the exitSMA and not currenlty exiting a long position
+        #s = cross.cross_above(self.__priceDS, self.__exitSMA) and not self.__longPos.exitActive()
+        s = cross.cross_above(self.__priceDS, self.__exitSMA) 
+        if s == 0: return False
+        else : return True
 
     def enterShortSignal(self, bar):
+        # price < last entrySMA and last RSI >= overBoughtThreshold
         return bar.getPrice() < self.__entrySMA[-1] and self.__rsi[-1] >= self.__overBoughtThreshold
 
     def exitShortSignal(self):
-        return cross.cross_below(self.__priceDS, self.__exitSMA) and not self.__shortPos.exitActive()
+        # prices crosses below exitSMA and not currently exiting short position
+        #return cross.cross_below(self.__priceDS, self.__exitSMA) and not self.__shortPos.exitActive()
+        s = cross.cross_below(self.__priceDS, self.__exitSMA)
+        if s == 0: return False
+        else : return True
+ 
