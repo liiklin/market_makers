@@ -6,11 +6,11 @@ from pyalgotrade import bar
 
 def parameters_generator():
     instrument = ["btc"]
-    entrySMA = range(120, 170)
-    exitSMA = range(8, 18)
+    entrySMA = range(120, 155)
+    exitSMA = range(10, 15)
     rsiPeriod = range(2, 4)
-    overBoughtThreshold = range(90, 96)
-    overSoldThreshold = range(19, 29)
+    overBoughtThreshold = range(70, 90)
+    overSoldThreshold = range(19, 35)
     initialAmount = [5000]
     return itertools.product(instrument, entrySMA, exitSMA, rsiPeriod, overBoughtThreshold, overSoldThreshold, initialAmount)
 
