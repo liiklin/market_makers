@@ -62,13 +62,13 @@ class RSI2(strategy.BacktestingStrategy):
         signals = (self.enterLongSignal(bar), self.exitLongSignal(), self.enterShortSignal(bar), self.exitShortSignal())
         if self.__longPos is not None and self.__longPos.isOpen() and (signals[1] or signals[2]) and not self.__longPos.exitActive():
             # we are long and get a long exit signal
-            print "Position Open: %s Age: %s Return: %s" % (self.__longPos.isOpen(), self.__longPos.getAge(), self.__longPos.getReturn())
-            print "SELL  @ %s $%s signals : %s %s %s %s " % (bars[self.__instrument].getPrice(), self.getBroker().getCash(), signals[0], signals[1], signals[2], signals[3])
+            print "On ?? SELL %s @ %s $%s signals : %s %s %s %s " % (self.__longPos.getShares() ,bars[self.__instrument].getPrice(), self.getBroker().getCash(), signals[0], signals[1], signals[2], signals[3])
             self.__longPos.exitMarket()
+            print "Position Open: %s Age: %s Return: %s" % (self.__longPos.exitFilled(), self.__longPos.getAge(), self.__longPos.getPnL())
         elif self.__longPos is None and (signals[0] or signals[3]):
             # we are short and get a long entry signal
             shares = int(self.getBroker().getCash() * 0.9 / bars[self.__instrument].getPrice())
-            print "BUY  %s @ %s $%s signals : %s %s %s %s " % (shares, bars[self.__instrument].getPrice(), self.getBroker().getCash(), signals[0], signals[1], signals[2], signals[3])
+            print "On ?? BUY  %s @ %s $%s signals : %s %s %s %s " % (shares, bars[self.__instrument].getPrice(), self.getBroker().getCash(), signals[0], signals[1], signals[2], signals[3] )
             self.__longPos = self.enterLong(self.__instrument, shares, True)
             
     def enterLongSignal(self, bar):
