@@ -60,7 +60,7 @@ class RSI2(strategy.BacktestingStrategy):
             return
         bar = bars[self.__instrument]
         signals = (self.enterLongSignal(bar), self.exitLongSignal(), self.enterShortSignal(bar), self.exitShortSignal())
-        if self.__longPos is not None and self.__longPos.isOpen() and (signals[1] or signals[2]) and not self.longPos.exitActive():
+        if self.__longPos is not None and self.__longPos.isOpen() and (signals[1] or signals[2]) and not self.__longPos.exitActive():
             # we are long and get a long exit signal
             print "Position Open: %s Age: %s Return: %s" % (self.__longPos.isOpen(), self.__longPos.getAge(), self.__longPos.getReturn())
             print "SELL  @ %s $%s signals : %s %s %s %s " % (bars[self.__instrument].getPrice(), self.getBroker().getCash(), signals[0], signals[1], signals[2], signals[3])
