@@ -1,0 +1,10 @@
+{
+    "CONNECTION":"mysql+pymysql://root:market_maker@market_maker_mariadb/market_maker",
+    "CUBE_NODE": ["qiadvisor_cubes:5000"], 
+    "CHART_CONFIG_FILE": "mvp_chart_definition.json", 
+    "VERSION": "0.0.18", 
+    "APPLICATION_KEYSPACE": "qi_advisor", 
+    "CUBE_NAME":"patient_encounter_anesthesia",
+    "DEFAULT_LOGIN_REDIRECT":"{{scheme}}://www.qiadvisor.{{sub_domain}}",
+    "ENFORCE_LOGIN":false
+}

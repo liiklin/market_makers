@@ -6,7 +6,7 @@ import time
 import datetime
 import calendar
 from sqlalchemy import create_engine, exc
-from sqlalchemy import Column, Date, ForeignKey, Integer, Numeric, PrimaryKeyConstraint, String, Table, UniqueConstraint
+from sqlalchemy import Column, Date, ForeignKey, Integer, Numeric, PrimaryKeyConstraint, String, Table, UniqueConstraint, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -41,7 +41,7 @@ class DimDateTime(Base):
     day = Column(Integer, nullable=False, index=True)
     hour = Column(Integer, nullable=False, index=True)
     minute = Column(Integer, nullable=False, index=True)
-    timestamp = Column(Integer, nullable=False, indext=True)
+    timestamp = Column(Integer, nullable=False, index=True)
 
 class CurrencyPair(Base):
     def __init__(self, name, baseCurrency, quoteCurrency, quantityIncrement=0, tickSize=0.1, takeLiquidityRate=0.0, provideLiquidityRate=0.0, feeCurrency="USD"):
@@ -75,10 +75,28 @@ class Symbol(Base):
         self.fullName = fullName
         self.isCrypto = crypto
     __tablename__ = "dim_symbol"
-    __table_args__ = (UniqueConstraint("name", name="uc_dim_symbol_key"))
+    __table_args__ = (UniqueConstraint("name", name="uc_dim_symbol_key"),)
     def __str__(self):
         return "%s" % (self.name)
     name = Column(String(20), nullable=False, index=True, primary_key=True)
-    fullName = Column(String(150), nullalbe=True)
+    fullName = Column(String(150), nullable=True)
     isCrypto = Column(Boolean())
+
+def create_db(connection):
+    STATEMENT = "create database IF NOT EXISTS market_data;"
+    #init_conn = connection.replace("/qiadvisor", "")
+    print "%s using connection %s" % (STATEMENT, connection)
+    engine = create_engine(connection)
+    c = engine.connect()
+    c.execute(STATEMENT)
+    c.close()
+    print STATEMENT  
+
+def drop_recreate_db(connection):
+    create_db(connection)
+    print "Dropping schema ..."
+    engine = create_engine(connection)
+    Base.metadata.drop_all(engine)
+    print "Recreate schema ..."
+    Base.metadata.create_all(engine)
 
