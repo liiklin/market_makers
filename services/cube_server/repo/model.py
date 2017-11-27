@@ -84,13 +84,18 @@ class Symbol(Base):
 
 def create_db(connection):
     STATEMENT = "create database IF NOT EXISTS market_data;"
-    #init_conn = connection.replace("/qiadvisor", "")
+    init_conn = connection.replace("/market_data", "")
     print "%s using connection %s" % (STATEMENT, connection)
     engine = create_engine(connection)
     c = engine.connect()
     c.execute(STATEMENT)
     c.close()
-    print STATEMENT  
+    #print STATEMENT  
+    
+def create_schema(connection):
+    print "Creating schema ..."
+    engine = create_engine(connection)
+    Base.metadata.create_all(engine)
 
 def drop_recreate_db(connection):
     create_db(connection)

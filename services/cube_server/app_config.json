@@ -1,5 +1,5 @@
 {
-    "CONNECTION":"mysql+pymysql://root:market_maker@market_maker_mariadb/market_maker",
+    "CONNECTION":"mysql+pymysql://root:market_maker@market_maker_mariadb/market_data",
     "CUBE_NODE": ["qiadvisor_cubes:5000"], 
     "CHART_CONFIG_FILE": "mvp_chart_definition.json", 
     "VERSION": "0.0.18", 
