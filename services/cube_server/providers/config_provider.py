@@ -4,7 +4,7 @@ class ConfigProvider(object):
     """
     Load and validate configuration data
     """
-    config_path = "app_config.json"
+    config_path = "./app_config.json"
     required_settings = []
     data = {}
     nodes = []
@@ -42,7 +42,10 @@ class ConfigProvider(object):
                     if "version" in self.data.keys():
                         #print "app_version : %s" % (self.data["version"])
                         pass
+                    #print "Config file %s loaded %s." % (self.config_path, self.data)
                     return
+        else:
+            print "Config file %s not found." % (self.config_path)
         if self.nodes is None:
             raise IOError("Missing or invalid config_path (%s) on ConnectionProvider" % \
                 (self.config_path))

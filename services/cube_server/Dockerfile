@@ -25,6 +25,7 @@ RUN pip install scipy
 RUN pip3 install jupyter
 RUN pip install matplotlib
 RUN pip install ipykernel
+RUN pip install sqlalchemy_utils
 RUN python2 -m ipykernel install --user
 
 RUN pip install mpipe

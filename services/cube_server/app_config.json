@@ -6,5 +6,6 @@
     "APPLICATION_KEYSPACE": "qi_advisor", 
     "CUBE_NAME":"patient_encounter_anesthesia",
     "DEFAULT_LOGIN_REDIRECT":"{{scheme}}://www.qiadvisor.{{sub_domain}}",
-    "ENFORCE_LOGIN":false
+    "ENFORCE_LOGIN":false,
+    "EXCHANGE_LIST":"./data/exchanges.txt"
 }
