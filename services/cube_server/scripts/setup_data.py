@@ -92,7 +92,7 @@ class SaveCurrencyPair(OrderedWorker):
             repo = CurrencyPairRepository(config_provider=get_config_provider())
             repo.add_get(CurrencyPair(name=id, baseCurrency=base_currency,\
                 quoteCurrency=quote_currency, exchange=exchange))
-            repo.loggger.info("Saved CurrencyPair %s", id)
+            #repo.logger.info("Saved CurrencyPair %s", id)
 
 class SaveSymbol(OrderedWorker):
     def doTask(self, data):
@@ -103,9 +103,9 @@ class SaveSymbol(OrderedWorker):
             repo = SymbolRepository(config_provider=get_config_provider())
             repo.add_get(Symbol(name, exchange_name))
             repo.add_get(Symbol(name1, exchange_name))
-            repo.logger.info("Saved Symbol %s", data)
+            #repo.logger.info("Saved Symbol %s", data)
         
-class CloseSymbolReopSession(OrderedWorker):
+class CloseSymbolRepoSession(OrderedWorker):
     def doTask(self, data):
         if SymbolRepository.active_session:
             SymbolRepository.active_session.close_all()
@@ -114,7 +114,7 @@ class CloseSymbolReopSession(OrderedWorker):
             lb = LoggingBase(config_provider=get_config_provider())
             lb.logger.info("Closed Symbol Repo Sessions")
 
-class CloseSymbolReopSession(OrderedWorker):
+class CloseCurrencyPairRepoSession(OrderedWorker):
     def doTask(self, data):
         if CurrencyPairRepository.active_session:
             CurrencyPairRepository.active_session.close_all()
@@ -144,7 +144,7 @@ def main():
         print 'pipe result %s' % (result)
     close1 = CloseSymbolRepoSession()
     close1.doTask("")
-    close2 = CloseCurRepoSessionRepoSession()
+    close2 = CloseCurrencyPairRepoSession()
     close2.doTask("")
 
 if __name__ == "__main__":

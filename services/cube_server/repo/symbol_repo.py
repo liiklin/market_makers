@@ -33,10 +33,11 @@ class SymbolRepository(LoggingBase):
         if query.count() > 0:
             return query.first()
         else:
-            self.logger.info("Inserted new symbol %s", symbol.name)
+            
             insert_symbol = symbol
             SymbolRepository.active_session.add(insert_symbol)
             SymbolRepository.active_session.commit()
+            self.logger.info("Inserted new symbol %s", symbol.name)
             return insert_symbol
         return None
 

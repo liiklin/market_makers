@@ -22,22 +22,23 @@ class CurrencyPairRepository(LoggingBase):
         items = self.active_session.query(CurrencyPair).all()
         return items
 
-    def add_get(self, CurrencyPair):
+    def add_get(self, currency_pair):
         """
         Add the provided CurrencyPair info to the database if it DNE
         expects dict of CurrencyPair values {"name":"", ...}
         """
         value_or_empty = lambda e, f: e[f] if f in e else ""
+        
         query = CurrencyPairRepository.active_session.query(CurrencyPair).filter_by(\
-            name=CurrencyPair.name)
+            name=currency_pair.name)
         if query.count() > 0:
             return query.first()
         else:
-            self.logger.info("Inserted new CurrencyPair %s", CurrencyPair.name)
-            insert_CurrencyPair = CurrencyPair
-            CurrencyPairRepository.active_session.add(insert_CurrencyPair)
+            insert_item = currency_pair
+            CurrencyPairRepository.active_session.add(insert_item)
             CurrencyPairRepository.active_session.commit()
-            return insert_CurrencyPair
+            self.logger.info("Inserted new CurrencyPair %s", insert_item.name)
+            return insert_item
         return None
 
     def truncate(self):
