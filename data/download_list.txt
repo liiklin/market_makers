@@ -1,0 +1,4 @@
+http://api.bitcoincharts.com/v1/csv/krakenUSD.csv.gz
+http://api.bitcoincharts.com/v1/csv/itbitUSD.csv.gz
+http://api.bitcoincharts.com/v1/csv/hitbtcUSD.csv.gz
+http://api.bitcoincharts.com/v1/csv/coinbaseUSD.csv.gz
