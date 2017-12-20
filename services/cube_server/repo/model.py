@@ -6,7 +6,7 @@ import time
 import datetime
 import calendar
 from sqlalchemy import create_engine, exc
-from sqlalchemy import Column, Date, ForeignKey, Integer, Numeric, PrimaryKeyConstraint, String, Table, UniqueConstraint, Boolean
+from sqlalchemy import Column, Date, ForeignKey, Integer, Numeric, PrimaryKeyConstraint, String, Table, UniqueConstraint, Boolean, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy_utils import database_exists
@@ -65,6 +65,8 @@ class CurrencyPair(Base):
     __table_args__ = (UniqueConstraint("name", "baseCurrency", "quoteCurrency", name="uc_dim_currency_pair_nbq_constraint"),)
     def __str__(self):
         return "%s_%s_%s" % (self.name, self.baseCurrency, self.quoteCurrency)
+    def as_dict(self):
+        return self.__dict__
     name = Column(String(20), nullable=False, index=True, primary_key=True)
     baseCurrency = Column(String(20), nullable=False, index=True, primary_key=False)
     quoteCurrency = Column(String(20), nullable=False, index=True, primary_key=False)
@@ -107,6 +109,56 @@ class Exchange(Base):
     name = Column(String(20), nullable=False, index=True, primary_key=True)
     public_url_base = Column(String(150), nullable=True)
     currency_pair_lookup = Column(String(150), nullable=True)
+
+class Trade(Base):
+    __tablename__ = "fact_trade"
+    #__table_args__ = (UniqueConstraint("name", name="uc_dim_exchange_key"),)
+    exchange = Column(String(20), nullable=False, index=True, primary_key=True)
+    currency_pair = Column(String(20), nullable=False, index=True, primary_key=True)
+    date_time = Column(Date(), primary_key=True)
+    price = Column(Numeric)
+    quantity = Column(Numeric)
+    side = Column(String(20), index=True)
+    date_time_hash = Column(String(20))
+    def __init__(self, exchange, currency_pair, date_time, price, quantity, side, date_time_hash):
+        self.exchange = exchange
+        self.currency_pair = currency_pair
+        self.date_time = date_time
+        self.price = price
+        self.quantity = quantity
+        self.side = side
+        self.date_time_hash = date_time_hash
+    def as_dict(self):
+        return self.__dict__
+class Price(Base):
+    __tablename__ = "fact_price"
+    
+    exchange = Column(String(20), nullable=False, index=True, primary_key=True)
+    currency_pair = Column(String(20), nullable=False, index=True, primary_key=True)
+    timestamp = Column(Integer, nullable=False, index=True)
+    datetime_hash = (Column(String(20)))
+    open = Column(Numeric, precision=8)
+    close = Column(Numeric, precision=8)
+    low = Column(Numeric, precision=8)
+    high = Column(Numeric, precision=8)
+    average = Column(Numeric, precision=8)
+    vol = Column(Numeric, precision=8)
+    std_price = Column(Numeric, precision=8)
+    def __init__(self, exchange, currency_pair, \
+        open, close, low, high, average, vol, std_price, 
+        timestamp):
+        self.exchange = exchange
+        self.currency_pair = currency_pair
+        self.open = open
+        self.close = close
+        self.low = low
+        self.high = high
+        self.average = average
+        self.vol = vol
+        self.std_price = std_price
+        self.timestamp = timestamp
+    def as_dict(self):
+        return self.__dict__
 
 def create_db(connection):
     STATEMENT = "create database IF NOT EXISTS market_data;"
