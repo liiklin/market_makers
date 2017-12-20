@@ -30,15 +30,13 @@ class PriceRepository(LoggingBase):
             timestamp=price.timestamp)
         if query.count() > 0:
             if error_if_exists:
-                raise Exception("Item with %s %s %s already exists" % (Price.currency, Price.currency_pair, Price.date_time ))
+                raise Exception("Item with %s %s %s already exists" % (price.currency, price.currency_pair, price.timestamp ))
             return query.first()
-        
         else:
-            insert_Price = Price
-            PriceRepository.active_session.add(insert_Price)
+            PriceRepository.active_session.add(price)
             PriceRepository.active_session.commit()
-            self.logger.info("Inserted new Price %s %s %s", Price.exchange, Price.currency_pair, Price.date_time)
-            return insert_Price
+            self.logger.info("Inserted new Price %s %s %s", price.exchange, price.currency_pair, price.timestamp)
+            return price
         return None
 
     def truncate(self):

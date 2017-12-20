@@ -7,6 +7,7 @@ import time
 import math
 from datetime import timedelta 
 from datetime import datetime
+import numpy as np
 from sqlalchemy_utils import database_exists, create_database, drop_database
 from repo.model import create_db, create_schema
 from providers.config_provider import ConfigProvider
@@ -173,7 +174,7 @@ class GetTradeRanges(OrderedWorker):
                 dr_repo.logger.info("Skipping %s because it's not in the download list", data["name"])
         else:
             dr_repo.logger.info("No download list found.")
-class GetRangeData(OrderedWorker):
+class AddPriceData(OrderedWorker):
     """
     Given a Pair name, exchange, start_date, end_data, exchange
     download the data and aggregate it into a price entry.
@@ -183,38 +184,43 @@ class GetRangeData(OrderedWorker):
         price_repo = PriceRepo(config_provider=get_config_provider())
 
         required_keys =  ["start_date", "end_date", "exchange", "name"]
-        data["start_ts"] = time.mktime(data["start_date"].timetuple())
-        data["end_ts"] = time.mktime(data["end_date"].timetuple())
-        api_call = "https://api.hitbtc.com/api/2/public/trades/{name}?sort=DESC&by=timestamp&from={start_ts}&till={end_ts}&limit=10000".format(**data)
-        r = requests.get(api_call)
-        max_price = 0
-        min_price = 9999999
-        open_price = -1
-        close_price = 0
-        vol = 0
-        avg_price = 0
-        if r.status_code == 200:
-            for trade in r.json():
-                if "price" in trade:
-                    if open_price = -1:
-                        open_price = trade["price"]
-                    min_price = math.min(min_price, trade["price"])
-                    max_price = math.max(max_price, trade["price"])
-                if "quantity" in trade:
-                    vol += trade["quantity"]
-            close_price = trade["price"]
-            p = Price(exchange=data["exchange"], 
-                currency_pair=data["name"], 
-                timestamp=data["start_ts"],
-                open = open_price,
-                close = close_price, 
-                low = min_price,
-                high = max_price, 
-                average = avg_price )
-        else:
-            price_repo.logger.info("Invalid status code %s for %s", r.status_code, api_call)
+        if is_valid_data_dict(required_keys):
+            data["start_ts"] = time.mktime(data["start_date"].timetuple())
+            data["end_ts"] = time.mktime(data["end_date"].timetuple())
+            api_call = "https://api.hitbtc.com/api/2/public/trades/{name}?sort=DESC&by=timestamp&from={start_ts}&till={end_ts}&limit=10000".format(**data)
+            r = requests.get(api_call)
+            max_price = 0
+            min_price = 9999999
+            open_price = -1
+            close_price = 0
+            vol = 0
+            avg_price = 0
+            plist = []
+            vlist = []
+            if r.status_code == 200:
+                for trade in r.json():
+                    if "price" in trade:
+                        if open_price == -1:
+                            open_price = trade["price"]
+                        min_price = math.min(min_price, trade["price"])
+                        max_price = math.max(max_price, trade["price"])
+                        plist.append(trade["price"])
 
-
+                    if "quantity" in trade:
+                        vol += trade["quantity"]
+                        vlist.append(trade["quantity"])
+                avg_price = np.average(plist, weights=vlist)
+                close_price = trade["price"]
+                p = Price(exchange=data["exchange"], 
+                    currency_pair=data["name"], 
+                    timestamp=data["start_ts"],
+                    open = open_price,
+                    close = close_price, 
+                    low = min_price,
+                    high = max_price, 
+                    average = avg_price )
+            else:
+                price_repo.logger.info("Invalid status code %s for %s", r.status_code, api_call)
 
 class SaveSymbol(OrderedWorker):
     def doTask(self, data):
@@ -263,6 +269,7 @@ def main():
     save_symbols = Stage(SaveSymbol, 1)
     save_curency_pair = Stage(SaveCurrencyPair)
     trade_dates = Stage(GetTradeRanges)
+    add_price = Stage(AddPriceData)
     # link stages
     stage_setup.link(stage_load_ex)
     stage_load_ex.link(save_exchange)
@@ -270,6 +277,7 @@ def main():
     #get_symbols.link(save_symbols)
     get_symbols.link(save_curency_pair)
     save_curency_pair.link(trade_dates)
+    trade_dates.link(add_price)
     # setup pipeline
     pipe = Pipeline(stage_setup)
     pipe.put(True)
