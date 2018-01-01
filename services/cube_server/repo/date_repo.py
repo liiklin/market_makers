@@ -19,19 +19,23 @@ class DateRepo(LoggingBase):
             DateRepo.session = sessionmaker(bind=self.db_engine)
             DateRepo.active_session = self.session()
 
-    def add_get(self, date):
+    def add_get(self, date=None, timestamp=None):
         """
         Add the provided date to the database if it DNE
         """
-        query = self.get_filter_query(date)
-        if query.count() > 0:
-            return query.first()
+        if timestamp:
+            date = DimDateTime(timestamp=timestamp)
+        if date:
+            query = self.get_filter_query(date)
+            if query.count() > 0:
+                return query.first()
+            else:
+                self.logger.info("Inserting DimDateTime %s", date.timestamp)
+                self.active_session.add(date)
+                self.active_session.commit()
+                return date
         else:
-            insert_date = DimDateTime(year=date.year, month=date.month,\
-                day=date.day, hour=date.hour, minute=date.minute)
-            self.active_session.add(insert_date)
-            self.active_session.commit()
-            return insert_date
+            raise Exception("Invalid date or timestamp, cannot add.")
 
     def get_filter_query(self, date):
         return self.active_session.query(DimDateTime).filter_by(\

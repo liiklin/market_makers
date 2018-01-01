@@ -24,20 +24,37 @@ class PriceRepository(LoggingBase):
         expects dict of Price values {"name":"", ...}
         """
         value_or_empty = lambda e, f: e[f] if f in e else ""
-        query = PriceRepository.active_session.query(price).filter_by(\
+        
+        if self.exists(price):
+            if error_if_exists:
+                raise Exception("Item with %s %s %s already exists" % (price.currency, price.currency_pair, price.timestamp ))
+            return self.get_first(price)
+        else:
+            PriceRepository.active_session.add(price)
+            PriceRepository.active_session.commit()
+            self.logger.info("Inserted new Price %s %s %s closing @: %s", price.exchange, price.currency_pair, price.timestamp, price.close)
+            return price
+        return None
+    
+    def get_first(self, price):
+        query = PriceRepository.active_session.query(Price).filter_by(\
+            exchange=price.exchange, 
+            currency_pair=price.currency_pair,
+            timestamp=price.timestamp)
+        if query.count():
+            return query.first()
+        else:
+            return None
+    
+    def exists(self, price):
+        query = PriceRepository.active_session.query(Price).filter_by(\
             exchange=price.exchange, 
             currency_pair=price.currency_pair,
             timestamp=price.timestamp)
         if query.count() > 0:
-            if error_if_exists:
-                raise Exception("Item with %s %s %s already exists" % (price.currency, price.currency_pair, price.timestamp ))
-            return query.first()
+            return True
         else:
-            PriceRepository.active_session.add(price)
-            PriceRepository.active_session.commit()
-            self.logger.info("Inserted new Price %s %s %s", price.exchange, price.currency_pair, price.timestamp)
-            return price
-        return None
+            return False
 
     def truncate(self):
         self.db_engine.execute("DELETE FROM fact_Price")

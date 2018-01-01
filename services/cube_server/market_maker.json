@@ -1,0 +1,55 @@
+{
+    "name": "market_maker",
+    "label": "Market Maker Data Store",
+    "description": "",
+    "cubes":
+    [
+        {
+            "name":"price", 
+            "dimensions": ["exchange","currency_pair","date","vol_zero"], 
+            "measures": ["open","close","high","low","vol"        
+                ],
+            "aggregates":[
+                {"name":"avg_open","function":"avg","measure":"open"},
+                {"name":"avg_close","function":"avg","measure":"close"},
+                {"name":"avg_high","function":"avg","measure":"high"},
+                {"name":"avg_low","function":"avg","measure":"low"},
+                {"name":"min_open", "function":"min", "measure":"open"},
+                {"name":"min_close","function":"min","measure":"close"},
+                {"name":"min_high","function":"min","measure":"high"},
+                {"name":"min_vol","function":"min","measure":"high"},
+                {"name":"volume","function":"sum","measure":"vol"},
+                {"name":"record_count","function":"count","label":"Record Count"}
+            ],
+            "joins":
+            [{"master":"timestamp","detail":"dim_date.timestamp"}
+            ]
+        }
+    ],
+    "dimensions":[
+        {"name":"vol_zero","label":"Volume Zero"},
+        {"name":"exchange","label":"Exchange"},
+        {"name":"currency_pair","label":"Currency Pair"},
+        {"name":"date","label":"timestamp",
+        "attributes":[
+            {"name":"year", "label":"Year"},
+            {"name":"month","label":"Month"},
+            {"name":"day","label":"Day"},
+            {"name":"hour","label":"Hour"},
+            {"name":"minute","label":"Minute"},
+            {"name":"timestamp","label":"Timestamp"}
+        ],
+        "levels":[
+            {"name":"year", "label":"Year", "attributes":["year"]},
+            {"name":"month", "label":"Month", "attributes":["month"]},
+            {"name":"day", "label":"Day", "attributes":["day"]},
+            {"name":"hour","label":"Hour","attributes":["hour"]},
+            {"name":"minute","label":"Minute", "attributes":["minute"]},
+            {"name":"timestamp","attributes":["timestamp"]}
+        ],
+        "hierarchies":[
+            {"name":"default", "levels":["year","month","day","hour","minute","timestamp"]}
+        ]
+    }
+    ]
+}
