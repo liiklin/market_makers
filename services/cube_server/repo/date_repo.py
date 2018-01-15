@@ -1,40 +1,49 @@
 from sqlalchemy import asc, create_engine, desc
 from sqlalchemy.orm import sessionmaker
-from model import DimDate
+from model import DimDateTime
+from providers.logging_base import LoggingBase
 
-class DateRepo(object):
+class DateRepo(LoggingBase):
     """
     Repo for Date
     """
     db_url = ""
     session = None
     active_session = None
-    def __init__(self, connection=""):
-        self.connection = connection
-        self.db_engine = create_engine(self.connection)
-        self.session = sessionmaker(bind=self.db_engine)
-        self.active_session = self.session()
+    db_engine = None
+    def __init__(self, config_provider=None):
+        super(DateRepo, self).__init__(config_provider=config_provider)
+        if not DateRepo.db_engine:
+            self.connection =  config_provider.data["connection"]
+            DateRepo.db_engine = create_engine(self.connection)
+            DateRepo.session = sessionmaker(bind=self.db_engine)
+            DateRepo.active_session = self.session()
 
-    def add_get(self, date):
+    def add_get(self, date=None, timestamp=None):
         """
         Add the provided date to the database if it DNE
         """
-        query = self.get_filter_query(date)
-        if query.count() > 0:
-            return query.first()
+        if timestamp:
+            date = DimDateTime(timestamp=timestamp)
+        if date:
+            query = self.get_filter_query(date)
+            if query.count() > 0:
+                return query.first()
+            else:
+                self.logger.info("Inserting DimDateTime %s", date.timestamp)
+                self.active_session.add(date)
+                self.active_session.commit()
+                return date
         else:
-            insert_date = DimDate(year=date.year, month=date.month,\
-                day=date.day, hour=date.hour, minute=date.minute, \
-                timestamp=date.timestamp,hash_value=date.hash_value)
-            self.active_session.add(insert_date)
-            self.active_session.commit()
-            return insert_date
+            raise Exception("Invalid date or timestamp, cannot add.")
+
     def get_filter_query(self, date):
-        return self.active_session.query(DimDate).filter_by(\
+        return self.active_session.query(DimDateTime).filter_by(\
             year=date.year, month=date.month, day=date.day, \
             hour=date.hour, minute=date.minute)
+
     def get_by_id(self, hash_value):
-        return self.active_session.query(DimDate).filter_by(hash_value=hash_value).first()
+        return self.active_session.query(DimDateTime).filter_by(hash_value=hash_value).first()
 
     def get(self, date):
         """
@@ -45,6 +54,7 @@ class DateRepo(object):
             return query.first()
         else:
             return None
+
     def delete(self, date):
         """
         Delete the date entry from the table
@@ -59,14 +69,14 @@ class DateRepo(object):
         self.db_engine.execute("DELETE FROM dim_date;")
 
     def get_max(self):
-        return  self.active_session.query(DimDate).order_by(desc(DimDate.date)).first()
+        return  self.active_session.query(DimDateTime).order_by(desc(DimDateTime.date)).first()
 
     def get_min(self):
-        return  self.active_session.query(DimDate).order_by(asc(DimDate.date)).first()
+        return  self.active_session.query(DimDateTime).order_by(asc(DimDateTime.date)).first()
 
     def get_range(self, min_date, max_date):
         """
         return range of dates inclusive. If min_date > max_date, consider if that is what you intended.
         """
-        return self.active_session.query(DimDate).filter(DimDate.date.between(str(min_date),str(max_date))).all()
+        return self.active_session.query(DimDateTime).filter(DimDateTime.date.between(str(min_date),str(max_date))).all()
 
