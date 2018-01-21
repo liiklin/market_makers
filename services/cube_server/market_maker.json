@@ -48,7 +48,8 @@
             {"name":"timestamp","attributes":["timestamp"]}
         ],
         "hierarchies":[
-            {"name":"default", "levels":["year","month","day","hour","minute","timestamp"]}
+            {"name":"default", "levels":["year","month","day","hour","minute","timestamp"]},
+            {"name":"month", "levels":["month"]}
         ]
     }
     ]
