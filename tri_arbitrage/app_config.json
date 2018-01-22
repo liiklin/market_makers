@@ -1,0 +1,5 @@
+{
+    "base_currencies":["BTC","BTS","USD"],
+    "trade_currencies":["STEEM","BCO","LTC","MAID","GRC","CNY","GOLD"],
+    "portfolio_amounts":{"BTC":1,"BTS":1000,"USD":1000}
+}
