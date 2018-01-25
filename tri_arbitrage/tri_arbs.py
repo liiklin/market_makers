@@ -23,7 +23,10 @@ def spread(ctx,source, allowed, amount):
             click.echo("base %s" % (order["base"]))
             click.echo("price %s" %(order["price"]))
             click.echo("quote symbol %s" % (order["quote"]["asset"]["symbol"]))
-            click.echo("quote %s" % (order["quote"]))
+            click.echo("buy %s %s @ %s %s/%s for %s %s" % \
+                (order["quote"]["amount"], order["quote"]["asset"]["symbol"],
+                order["price"], order["base"]["asset"]["symbol"], order["quote"]["asset"]["symbol"], 
+                order["base"]["amount"], order["base"]["asset"]["symbol"]))
             click.echo("order: %s" %(order.json()))
 def parse_orders(items, type):
     orders = []
