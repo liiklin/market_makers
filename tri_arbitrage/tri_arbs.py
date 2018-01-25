@@ -18,7 +18,13 @@ def spread(ctx,source, allowed, amount):
         market = Market(pair, bitshares_instance=ctx.bitshares)
         orderbook = market.orderbook()
         orders_ask = parse_orders(orderbook["asks"],"ask")
-        click.echo("%s" % (orders_ask))
+        for order in orders_ask:
+            click.echo("base symbol %s" % (order["base"]["asset"]["symbol"]))
+            click.echo("base %s" % (order["base"]))
+            click.echo("price %s" %(order["price"]))
+            click.echo("quote symbol %s" % (order["quote"]["asset"]["symbol"]))
+            click.echo("quote %s" % (order["quote"]))
+            click.echo("order: %s" %(order.json()))
 def parse_orders(items, type):
     orders = []
     for item in items:
