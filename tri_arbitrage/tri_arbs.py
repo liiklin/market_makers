@@ -10,7 +10,7 @@ import json
 @click.option("--amount", default=100)
 @click.pass_context
 @online
-def spread(ctx,source, allowed, amount):
+def spread_get(ctx,source, allowed, amount):
     click.echo("%s-%s:%s" % (source, allowed, amount))
     allowed_items = allowed.split(",")
     for item in allowed_items:
@@ -28,6 +28,25 @@ def spread(ctx,source, allowed, amount):
                 order["price"], order["base"]["asset"]["symbol"], order["quote"]["asset"]["symbol"], 
                 order["base"]["amount"], order["base"]["asset"]["symbol"]))
             click.echo("order: %s" %(order.json()))
+
+@main.command()
+@click.argument("base")
+@click.argument("asset")
+@click.argument("start")
+@click.argument("stop")
+@click.pass_context
+@online
+def trades_csv(ctx, base, asset, start, stop):
+    click.echo("%s-%s from %s to %s" % (base, asset, start, stop))
+    pair = "%s-%s" % (base, asset)
+    market = Market(pair, bitshares_instance=ctx.bitshares)
+    trades = market.trades(start=start, stop=stop)
+    
+    for trade in trades:
+        click.echo("%s,%s,%s,%s/%s"  % \
+            (trade["time"], trade["base"]["amount"], trade["quote"]["amount"], 
+            trade["base"]["symbol"], trade["quote"]["symbol"]))
+        
 def parse_orders(items, type):
     orders = []
     for item in items:
