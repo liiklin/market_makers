@@ -1,3 +1,13 @@
 bin
 lib
-tri_arbs
+tri_arbitrage/tri_arb
+*.aux
+*.log
+*.out
+*.gz
+*.latexmk
+*.fls
+*.pyc
+*.5m
+objectdb
+*.fdb_latexmk

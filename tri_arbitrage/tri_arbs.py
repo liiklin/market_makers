@@ -2,7 +2,9 @@ import click
 from uptick.decorators import unlock, online
 from uptick.main import main
 from bitshares.market import Market
+from bitshares.utils import formatTime, formatTimeString
 import json
+from datetime import datetime
 
 @main.command()
 @click.argument("source")
@@ -37,14 +39,17 @@ def spread_get(ctx,source, allowed, amount):
 @click.pass_context
 @online
 def trades_csv(ctx, base, asset, start, stop):
-    click.echo("%s-%s from %s to %s" % (base, asset, start, stop))
+    dt_start = formatTimeString(start)
+    dt_stop = formatTimeString(stop)
+    click.echo("%s-%s from %s to %s" % (base, asset, dt_start, dt_stop))
     pair = "%s-%s" % (base, asset)
     market = Market(pair, bitshares_instance=ctx.bitshares)
-    trades = market.trades(start=start, stop=stop)
+    trades = market.trades(start=dt_start, stop=dt_stop, limit=100)
     
     for trade in trades:
-        click.echo("%s,%s,%s,%s/%s"  % \
-            (trade["time"], trade["base"]["amount"], trade["quote"]["amount"], 
+        click.echo("%s,%s,%s,%s,%s/%s"  % \
+            (trade["time"],  
+            trade["price"],trade["base"]["amount"], trade["quote"]["amount"],
             trade["base"]["symbol"], trade["quote"]["symbol"]))
         
 def parse_orders(items, type):
