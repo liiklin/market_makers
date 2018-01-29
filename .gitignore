@@ -3,3 +3,14 @@ lib
 tri_arbs
 *.pyc
 *.tar.gz
+tri_arbitrage/tri_arb
+*.aux
+*.log
+*.out
+*.gz
+*.latexmk
+*.fls
+*.pyc
+*.5m
+objectdb
+*.fdb_latexmk
