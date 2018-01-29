@@ -1,10 +1,10 @@
+import pandas as pd
+pd.TimeSeries = pd.Series
 import QSTK.qstkutil.qsdateutil as du
 import QSTK.qstkutil.tsutil as tsu
 import QSTK.qstkutil.DataAccess as da
 import datetime as dt
 import matplotlib.pyplot as plt
-import pandas as pd
-
 
 def load_symbols(symbols = ["AAPL", "GLD", "GOOG", "$SPX", "XOM"]):
     ls_symbols = symbols 
