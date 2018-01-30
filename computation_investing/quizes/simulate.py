@@ -24,8 +24,6 @@ def simulate(dt_start, dt_end, ls_symbols, allocations):
     dt_timeofday = dt.timedelta(hours=16)
     ldt_timestamps = du.getNYSEdays(dt_start, dt_end, dt_timeofday)
     data = get_data(ldt_timestamps, ls_symbols, ["close","vol"])
-    
-    
     return (vol, daily_ret, sharpe, cum_ret)
 
 def get_data(ldt_timestamps, ls_symbols, ls_keys ):
