@@ -17,14 +17,14 @@ def simulate(dt_start, dt_end, ls_symbols, allocations):
         where each value is a data fram
     """
     std_ret = 0
-    vol = 0
+    volatility = 0
     daily_ret = 0
     sharpe = 0
     cum_ret = 0
     dt_timeofday = dt.timedelta(hours=16)
     ldt_timestamps = du.getNYSEdays(dt_start, dt_end, dt_timeofday)
     data = get_data(ldt_timestamps, ls_symbols, ["close","vol"])
-    return (vol, daily_ret, sharpe, cum_ret)
+    return (volatility, daily_ret, sharpe, cum_ret)
 
 def get_data(ldt_timestamps, ls_symbols, ls_keys ):
     
