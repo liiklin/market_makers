@@ -19,6 +19,8 @@ class TestSimulate(unittest.TestCase):
             ["GOOG","$SPX","XOM"], \
             allocations)
         self.assertIsNotNone(result)
+        print(result)
+        
     def formatTimeString(self, time):
         return datetime.strptime(time, timeFormat)
         
