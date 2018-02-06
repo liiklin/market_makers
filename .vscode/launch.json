@@ -37,6 +37,23 @@
             ]
         },
         {
+            "name": "Python - optimizer",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": true,
+            "pythonPath": "${config:python.pythonPath}",
+            "program": "${file}",
+            "cwd": "${workspaceRoot}",
+            "env": {},
+            "envFile": "${workspaceRoot}/.env",
+            "args":["2011", "1", "1", "2011", "12", "31", "AAPL,GOOG,XOM"],
+            "debugOptions": [
+                "WaitOnAbnormalExit",
+                "WaitOnNormalExit",
+                "RedirectOutput"
+            ]
+        },
+        {
             "name": "PySpark",
             "type": "python",
             "request": "launch",
