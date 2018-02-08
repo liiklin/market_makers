@@ -39,19 +39,32 @@ def spread_get(ctx,source, allowed, amount):
 @click.pass_context
 @online
 def trades_csv(ctx, base, asset, start, stop):
-    dt_start = formatTimeString(start)
-    dt_stop = formatTimeString(stop)
+    if "T" in start:
+        dt_start = formatTimeString(start)
+    else:
+        dt_start = formatDateString(start)
+    if "T" in stop:
+        dt_stop = formatTimeString(stop)
+    else:
+        dt_stop = formatDateString(stop)
+
     click.echo("%s-%s from %s to %s" % (base, asset, dt_start, dt_stop))
     pair = "%s-%s" % (base, asset)
     market = Market(pair, bitshares_instance=ctx.bitshares)
     trades = market.trades(start=dt_start, stop=dt_stop, limit=100)
-    
+    click.echo("%s,%s,%s,%s,%s" % ("Date","Price","Base_Amount","Amount","Pair"))
     for trade in trades:
         click.echo("%s,%s,%s,%s,%s/%s"  % \
             (trade["time"],  
             trade["price"],trade["base"]["amount"], trade["quote"]["amount"],
             trade["base"]["symbol"], trade["quote"]["symbol"]))
-        
+
+dateFormat = '%Y-%m-%d'
+def formatDateString(t):
+    """ Properly Format Time for permlinks
+    """
+    return datetime.strptime(t, dateFormat)
+
 def parse_orders(items, type):
     orders = []
     for item in items:
