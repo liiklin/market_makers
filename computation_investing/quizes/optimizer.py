@@ -35,7 +35,7 @@ def generate_allocations(count, by=.1, min=0, max=1):
         l_item.append(1-sum(l_item))
         if sum(l_item) == 1:
             valid_allocations.append(l_item)
-    valid_allocations = [x for x in valid_allocations if not any(y < 0 for y in x)]
+    valid_allocations = [x for x in valid_allocations if not any(y < 0 for y in)]
     return valid_allocations
         
 
