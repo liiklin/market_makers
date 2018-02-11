@@ -54,3 +54,26 @@ def find_events(symbols, d_data, verbose=False):
              		close[symbol][i] = 1.0 #overwriting the price by the bit
 	    close[symbol][close[symbol]< 1.0] = np.NAN
 	return close
+
+def find_drop_below_five(symbols, d_data, verbose=False):
+	"""
+	Create an event matrix of days where a stock price drops below $5
+	"""
+	storename = "Yahoo" # get data from our daily prices source
+	# Available field names: open, close, high, low, close, actual_close, volume
+	closefield = "close"
+	volumefield = "volume"
+	window = 10
+
+	if verbose:
+            print __name__ + " reading data"
+	close = d_data[closefield]
+	if verbose:
+            print __name__ + " finding events"
+	for symbol in symbols:
+	    close[symbol][close[symbol]>= 1.0] = np.NAN
+	    for i in range(1,len(close[symbol])):
+	        if np.isnan(close[symbol][i-1]) and close[symbol][i] < 1.0 :#(i-1)th was > $1, and (i)th is <$1
+             		close[symbol][i] = 1.0 #overwriting the price by the bit
+	    close[symbol][close[symbol]< 1.0] = np.NAN
+	return close

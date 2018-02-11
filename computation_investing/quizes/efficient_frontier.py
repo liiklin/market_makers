@@ -4,11 +4,11 @@ This source code is released under the New BSD license.  Please see
 http://wiki.quantsoftware.org/index.php?title=QSTK_License
 for license details.
 
-Created on January, 24, 2013
+Created on Feb, 2, 2018
 
-@author: Sourabh Bajaj
-@contact: sourabhbajaj@gatech.edu
-@summary: Demonstrates the use of the CVXOPT portfolio optimization call.
+@author: Michael Schwab
+@contact: mcstar@gmail.com
+@summary: Efficient Frontier.
 '''
 # Support newer versions of pandas by overriding TimeSeries
 import pandas as pd
