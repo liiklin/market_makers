@@ -64,16 +64,15 @@ def find_drop_below_five(symbols, d_data, verbose=False):
 	closefield = "close"
 	volumefield = "volume"
 	window = 10
-
+	i_count = 0
 	if verbose:
             print __name__ + " reading data"
 	close = d_data[closefield]
-	if verbose:
-            print __name__ + " finding events"
-	for symbol in symbols:
-	    close[symbol][close[symbol]>= 1.0] = np.NAN
-	    for i in range(1,len(close[symbol])):
-	        if np.isnan(close[symbol][i-1]) and close[symbol][i] < 1.0 :#(i-1)th was > $1, and (i)th is <$1
-             		close[symbol][i] = 1.0 #overwriting the price by the bit
-	    close[symbol][close[symbol]< 1.0] = np.NAN
-	return close
+	close_prior = d_data[closefield].shift(-1)
+	for s in symbols:
+		close[s]["gte5"] = close[s] >= 5
+		close[s]["lte5"] = close_prior[s] < 5
+	events = close.apply(lambda row: (row["gte5"] & row["lte5"])).applymap(lambda x: 1 if x == True else np.nan)
+	
+	return events
+	
