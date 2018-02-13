@@ -2,7 +2,11 @@ import sys
 import fileinput
 import click
 from datetime import datetime
+from datetime import timedelta
 from operator import itemgetter
+import QSTK.qstkutil.qsdateutil as du
+import QSTK.qstkutil.DataAccess as da
+
 
 def ignore_exception(IgnoreException=Exception,DefaultVal=None):
     """ Decorator for ignoring exception from a function
@@ -17,10 +21,29 @@ def ignore_exception(IgnoreException=Exception,DefaultVal=None):
                 return DefaultVal
         return _dec
     return dec
+def price_as_of(prices, date):
+    pass
 
 def process_orders(orders):
     orders  = sorted(orders, key=itemgetter("date"))
-    print "multi-pass portfolio: %s " % (orders)
+    ls_symbols = list(set([x["symbol"] for x in orders if not "PORTFOLIO" in x["symbol"]]))
+    dt_start = min([x["date"] for x in orders]) - timedelta(days=1)
+    dt_end = max([x["date"] for x in orders]) + timedelta(days=1)
+    ldt_timestamps = du.getNYSEdays(dt_start, dt_end)
+    dataobj = da.DataAccess("Yahoo")
+    ls_keys = ['open', 'high', 'low', 'close', 'volume', 'actual_close']
+    ldf_data = dataobj.get_data(ldt_timestamps, ls_symbols, ls_keys)
+    d_data = dict(zip(ls_keys, ldf_data))
+
+    for order in orders:
+        if "DEPOSIT" in order["action"]:
+            print 'make deposit: $%s to %s' % (order["shares"],order["symbol"])
+        if "BUY" in order["action"]:
+            print 'BUY %s, %s' % (order["shares"], order["symbol"])
+        if "SELL" in order["action"]:
+            print 'SELL %s, %s' % (order["shares"], order["symbol"])
+        
+    #print "multi-pass portfolio: %s " % (orders)
 
 @click.command()
 def main():
