@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 import math
 import copy
+import click
 import QSTK.qstkutil.qsdateutil as du
 import datetime as dt
 import QSTK.qstkutil.DataAccess as da
@@ -29,7 +30,7 @@ nan = no information about any event.
 1 = status bit(positively confirms the event occurence)
 """
 
-def find_events(ls_symbols, d_data):
+def find_events(ls_symbols, d_data, t_val):
     df_close = d_data['actual_close']
     ts_market = df_close['SPY']
 
@@ -48,12 +49,12 @@ def find_events(ls_symbols, d_data):
             f_symprice_today = df_close[s_sym].ix[ldt_timestamps[i]]
             f_symprice_yest = df_close[s_sym].ix[ldt_timestamps[i - 1]]
             
-            if f_symprice_yest >= 5.00 and f_symprice_today < 5.00:
+            if f_symprice_yest >= float(t_val) and f_symprice_today < float(t_val):
                 df_events[s_sym].ix[ldt_timestamps[i]] = 1
 
     return df_events
 
-def event_profiler(ldt_timestamps, symbols_list):
+def event_profiler(ldt_timestamps, symbols_list, t_val):
     dataobj = da.DataAccess('Yahoo')
     ls_symbols = dataobj.get_symbols_from_list(symbols_list)
     ls_symbols.append('SPY')
@@ -66,22 +67,25 @@ def event_profiler(ldt_timestamps, symbols_list):
         d_data[s_key] = d_data[s_key].fillna(method = 'bfill')
         d_data[s_key] = d_data[s_key].fillna(1.0)
 
-    df_events = find_events(ls_symbols, d_data)
-    report_filename = "hw2_event_study6_" + symbols_list + ".pdf"
+    df_events = find_events(ls_symbols, d_data, t_val)
+    report_filename = "hw2_event_study%s_%s.pdf" % (t_val, symbols_list)
     print "Creating Study " + symbols_list
     ep.eventprofiler(df_events, d_data, i_lookback=20, i_lookforward=20,
                 s_filename=report_filename, b_market_neutral=True, b_errorbars=True,
                 s_market_sym='SPY')
 
-
-
-if __name__ == '__main__':
+@click.command()
+@click.argument("t_val")
+def start_study(t_val):
     dt_start = dt.datetime(2008, 1, 1)
     dt_end = dt.datetime(2009, 12, 31)
     ldt_timestamps = du.getNYSEdays(dt_start, dt_end, dt.timedelta(hours=16))
 
     ## Starting up with SP500 2008
-    event_profiler(ldt_timestamps, 'sp5002008')
+    event_profiler(ldt_timestamps, 'sp5002008', t_val)
 
     ## Doing the SP500 2012
-    event_profiler(ldt_timestamps, 'sp5002012')
+    event_profiler(ldt_timestamps, 'sp5002012', t_val)
+
+if __name__ == '__main__':
+    start_study()
