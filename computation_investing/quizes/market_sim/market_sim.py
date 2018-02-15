@@ -1,12 +1,13 @@
 import fileinput
 import click
+import numpy as np
+
 from datetime import datetime
 from datetime import timedelta
 from operator import itemgetter
 
 import QSTK.qstkutil.qsdateutil as du
 import QSTK.qstkutil.DataAccess as da
-
 
 def ignore_exception(IgnoreException=Exception,DefaultVal=None):
     """ Decorator for ignoring exception from a function
@@ -29,11 +30,12 @@ def get_next_open_price(prices, date, symbol):
 def process_orders(orders):
     orders  = sorted(orders, key=itemgetter("date"))
     ls_symbols = list(set([x["symbol"] for x in orders if not "PORTFOLIO" in x["symbol"]]))
+    ls_symbols = np.array(ls_symbols,dtype='S10')
     dt_start = min([x["date"] for x in orders]) - timedelta(days=1)
     dt_end = max([x["date"] for x in orders]) + timedelta(days=1)
     ldt_timestamps = du.getNYSEdays(dt_start, dt_end)
-    dataobj = da.DataAccess("Yahoo")
-    ls_keys = ['open', 'close']
+    dataobj = da.DataAccess("Yahoo", verbose=True)
+    ls_keys = ['actual_close']
     ldf_data = dataobj.get_data(ldt_timestamps, ls_symbols, ls_keys, verbose=True)
     for d in ldf_data:
         d.fillna(method="pad")
