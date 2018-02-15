@@ -1,9 +1,9 @@
-import sys
 import fileinput
 import click
 from datetime import datetime
 from datetime import timedelta
 from operator import itemgetter
+
 import QSTK.qstkutil.qsdateutil as du
 import QSTK.qstkutil.DataAccess as da
 
@@ -21,8 +21,10 @@ def ignore_exception(IgnoreException=Exception,DefaultVal=None):
                 return DefaultVal
         return _dec
     return dec
-def price_as_of(prices, date):
-    pass
+def get_next_open_price(prices, date, symbol):
+    open_prices = prices["open"]
+    next_open = prices[open_prices[symbol].date > date].iloc[0]
+    return next_open
 
 def process_orders(orders):
     orders  = sorted(orders, key=itemgetter("date"))
@@ -31,18 +33,23 @@ def process_orders(orders):
     dt_end = max([x["date"] for x in orders]) + timedelta(days=1)
     ldt_timestamps = du.getNYSEdays(dt_start, dt_end)
     dataobj = da.DataAccess("Yahoo")
-    ls_keys = ['open', 'high', 'low', 'close', 'volume', 'actual_close']
-    ldf_data = dataobj.get_data(ldt_timestamps, ls_symbols, ls_keys)
+    ls_keys = ['open', 'close']
+    ldf_data = dataobj.get_data(ldt_timestamps, ls_symbols, ls_keys, verbose=True)
+    for d in ldf_data:
+        d.fillna(method="pad")
+        d.fillna(method="bfill")
     d_data = dict(zip(ls_keys, ldf_data))
 
     for order in orders:
         if "DEPOSIT" in order["action"]:
             print 'make deposit: $%s to %s' % (order["shares"],order["symbol"])
         if "BUY" in order["action"]:
-            print 'BUY %s, %s' % (order["shares"], order["symbol"])
+            price =  get_next_open_price(d_data, order["date"], order["symbol"])
+            print 'BUY %s, %s @%s' % (order["shares"], order["symbol"],price)
         if "SELL" in order["action"]:
-            print 'SELL %s, %s' % (order["shares"], order["symbol"])
-        
+            price =  get_next_open_price(d_data, order["date"], order["symbol"])
+            print 'SELL %s, %s, @%s' % (order["shares"], order["symbol"], price)
+    return "result"   
     #print "multi-pass portfolio: %s " % (orders)
 
 @click.command()
