@@ -14,12 +14,12 @@ class Test_Market_Sim(unittest.TestCase):
         
         orders = [{"symbol":"GOOG", "date":datetime(2008,1,1), \
         "action":"BUY","shares":199}, 
-        {"symbol":"XOM", "date":datetime(2008,3,1), \
+        {"symbol":"AAPL", "date":datetime(2008,12,31), \
         "action":"BUY","shares":299}]
         # act
         result = process_orders(orders)
         # assert
-        self.assertIsNone(result)
+        self.assertIsNotNone(result)
 
 if __name__ == "__main__":
     unittest.main()
