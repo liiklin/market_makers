@@ -1,5 +1,7 @@
 import fileinput
 import click
+import numpy as np
+
 from datetime import datetime
 from datetime import timedelta
 from operator import itemgetter
