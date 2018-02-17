@@ -33,6 +33,11 @@ def get_next_open_price(prices, date, symbol):
         return float(open_prices[open_prices.index >date].iloc[0][symbol])
     
     return None
+def portfolio_value(date, portfolio, orders, prices):
+    """
+    calculate the portfolio value on a date given 
+    the existing portfolio, any orders and the stock prices
+    """
 
 def process_orders(orders):
     orders  = sorted(orders, key=itemgetter("date"))
@@ -62,7 +67,9 @@ def process_orders(orders):
             print 'SELL %s, %s, @%s' % (order["shares"], order["symbol"], price)
     return "result"   
     #print "multi-pass portfolio: %s " % (orders)
-
+class Portfolio(object):
+    stocks=None
+    cash=0f
 @click.command()
 def main():
     orders = []
