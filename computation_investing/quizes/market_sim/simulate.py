@@ -5,7 +5,7 @@ import numpy as np
 from datetime import datetime
 from datetime import timedelta
 from operator import itemgetter
-import numpy as np
+import pandas as pd
 import datetime as dt
 import QSTK.qstkutil.qsdateutil as du
 import QSTK.qstkutil.DataAccess as da
@@ -33,18 +33,20 @@ def get_next_open_price(prices, date, symbol):
         return float(open_prices[open_prices.index >date].iloc[0][symbol])
     
     return None
-def portfolio_value(date, portfolio, orders, prices):
-    """
-    calculate the portfolio value on a date given 
-    the existing portfolio, any orders and the stock prices
-    """
 
 def process_orders(orders):
-    orders  = sorted(orders, key=itemgetter("date"))
-    ls_symbols = list(set([x["symbol"] for x in orders if not "PORTFOLIO" in x["symbol"]]))
+    add_16h = lambda dt: dt + timedelta(hours=16) 
+    #orders  = sorted(orders, key=itemgetter("date"))
+    orders["date"] = map(add_16h, orders["date"])
+    df_orders=pd.DataFrame(orders)
+    df_orders = df_orders.set_index("date")
+    #ls_symbols = list(set([x["symbol"] for x in orders if not "PORTFOLIO" in x["symbol"]]))
+    ls_symbols = list(df_orders.columns.values)
     #ls_symbols = np.loadtxt("/mnt/extradrive1/projects/market_makers/computation_investing/quizes/event_study/short.txt",dtype='S10',comments='#')
-    dt_start = min([x["date"] for x in orders]) - timedelta(days=1)
-    dt_end = max([x["date"] for x in orders]) + timedelta(days=1)
+    dt_start = df_orders.index[0] + dt.timedelta(days=-1)
+    dt_end = df_orders.index[-1]
+    #dt_start = min([x["date"] for x in orders]) - timedelta(days=1)
+    #dt_end = max([x["date"] for x in orders]) + timedelta(days=1)
     #dt_start = dt.datetime(int(2008) - 1,1,1)
     #dt_end = dt.datetime(int(2008),12,31)
     ldt_timestamps = du.getNYSEdays(dt_start, dt_end, dt.timedelta(hours=16))
@@ -55,21 +57,29 @@ def process_orders(orders):
         d.fillna(method="pad")
         d.fillna(method="bfill")
     d_data = dict(zip(ls_keys, ldf_data))
+    df_prices_close = d_data["close"]
+    df_zeros = pd.DataFrame(0,ldt_timestamps, columns=ls_symbols)
+    df_order_wrong_day = df_orders[~df_orders.index.isin(df_zeros.index)]
+    print ("Dropping Orders on Market Closed Days...")
+    print (df_order_wrong_day)
+    df_orders.dropna(df_order_wrong_day.index, inplace=True)
+    df_order_changes = df_orders.combine_first(df_zeros)
+    df_order_values = df_order_changes * df_prices_close
 
-    for order in orders:
-        if "DEPOSIT" in order["action"]:
-            print 'make deposit: $%s to %s' % (order["shares"],order["symbol"])
-        if "BUY" in order["action"]:
-            price =  get_next_open_price(d_data, order["date"], order["symbol"])
-            print 'BUY %s, %s @%s' % (order["shares"], order["symbol"],price)
-        if "SELL" in order["action"]:
-            price =  get_next_open_price(d_data, order["date"], order["symbol"])
-            print 'SELL %s, %s, @%s' % (order["shares"], order["symbol"], price)
+    #for order in orders:
+    #    if "DEPOSIT" in order["action"]:
+    #        print 'make deposit: $%s to %s' % (order["shares"],order["symbol"])
+    #    if "BUY" in order["action"]:
+    #        price =  get_next_open_price(d_data, order["date"], order["symbol"])
+    #        print 'BUY %s, %s @%s' % (order["shares"], order["symbol"],price)
+    #    if "SELL" idn order["action"]:
+    #        price =  get_next_open_price(d_data, order["date"], order["symbol"])
+    #        print 'SELL %s, %s, @%s' % (order["shares"], order["symbol"], price)
     return "result"   
     #print "multi-pass portfolio: %s " % (orders)
 class Portfolio(object):
     stocks=None
-    cash=0f
+    cash=0
 @click.command()
 def main():
     orders = []
