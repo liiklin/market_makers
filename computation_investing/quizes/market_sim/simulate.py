@@ -34,7 +34,7 @@ def get_next_open_price(prices, date, symbol):
     
     return None
 
-def process_orders(orders):
+def process_orders(orders, initial_cash=10000):
     add_16h = lambda dt: dt + timedelta(hours=16) 
     #orders  = sorted(orders, key=itemgetter("date"))
     orders["date"] = map(add_16h, orders["date"])
@@ -59,13 +59,24 @@ def process_orders(orders):
     d_data = dict(zip(ls_keys, ldf_data))
     df_prices_close = d_data["close"]
     df_zeros = pd.DataFrame(0,ldt_timestamps, columns=ls_symbols)
+    # drop any orders not on trading days
     df_order_wrong_day = df_orders[~df_orders.index.isin(df_zeros.index)]
     print ("Dropping Orders on Market Closed Days...")
     print (df_order_wrong_day)
-    df_orders.dropna(df_order_wrong_day.index, inplace=True)
-    df_order_changes = df_orders.combine_first(df_zeros)
-    df_order_values = df_order_changes * df_prices_close
-
+    df_orders.drop(df_order_wrong_day.index, inplace=True)
+    # create a data frame with rows for each date in range
+    # containing the trade values
+    df_order_trades = df_orders.combine_first(df_zeros)
+    # Calculate the cash value of each trade using close prices
+    df_trade_values = df_order_trades * df_prices_close
+    # Calculate the porfolio stock holdings for each day
+    df_portfolio_holdings = df_order_trades.cumsum(axis=0)
+    # Calculate the cash portion of the portfolio
+    df_portfolio_cash = ((df_trade_values.sum(axis=1) * -1) + initial_cash).cumsum()
+    # Calcuate the cash value of the portfolio stock holdings
+    df_portfolio_stock_value = df_portfolio_holdings * df_prices_close
+    # Calculate the daily portfolio value (sum of stock values and cash)
+    df_portfolio_value = df_portfolio_stock_value.sum() + df_portfolio_cash
     #for order in orders:
     #    if "DEPOSIT" in order["action"]:
     #        print 'make deposit: $%s to %s' % (order["shares"],order["symbol"])

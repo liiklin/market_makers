@@ -11,8 +11,8 @@ class Test_Market_Sim(unittest.TestCase):
         
     def test_process_order(self):
         # arrange
-        order_dates=[datetime(2008,1,1),datetime(2008,1,2), datetime(2008,3,1), datetime(2008,5,3)]
-        orders = {"date":order_dates,"GOOG":[10,10,2,0], "AAPL":[0,0,0,20], "XOM":[50,50,32,0]}
+        order_dates=[datetime(2008,1,2),datetime(2008,1,4), datetime(2008,1,8), datetime(2008,1,14), datetime(2008,1,15)]
+        orders = {"date":order_dates,"GOOG":[10,10,2,-30,5], "AAPL":[0,0,0,20,10], "XOM":[50,50,-32,0,5]}
         #orders = [{"symbol":"GOOG", "date":datetime(2008,1,1), \
         #"action":"BUY","shares":199}, 
         #{"symbol":"XOM", "date":datetime(2008,3,1), \
