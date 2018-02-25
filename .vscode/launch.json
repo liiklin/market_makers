@@ -4,6 +4,20 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+{
+    "name": "Python",
+    "type": "python",
+    "request": "launch",
+    "stopOnEntry": true,
+    "pythonPath": "${config:python.pythonPath}",
+    "program": "${file}",
+    "cwd": "${workspaceFolder}",
+    "env": {},
+    "envFile": "${workspaceFolder}/.env",
+    "debugOptions": [
+        "RedirectOutput"
+    ]
+},
     {
         "name": "Python Module",
         "type": "python",
@@ -21,15 +35,16 @@
         ]
     },
         {
-            "name": "Python",
+            "name": "Python - simulate",
             "type": "python",
             "request": "launch",
             "stopOnEntry": true,
             "pythonPath": "${config:python.pythonPath}",
             "program": "${file}",
-            "cwd": "${workspaceRoot}",
+            "cwd": "",
             "env": {},
             "envFile": "${workspaceRoot}/.env",
+            "args":["1000000", "test_orders.csv", "p.csv"],
             "debugOptions": [
                 "WaitOnAbnormalExit",
                 "WaitOnNormalExit",
@@ -43,7 +58,7 @@
             "stopOnEntry": true,
             "pythonPath": "${config:python.pythonPath}",
             "program": "${file}",
-            "cwd": "${workspaceRoot}",
+            "cwd": "",
             "env": {},
             "envFile": "${workspaceRoot}/.env",
             "args":["2011", "1", "1", "2011", "12", "31", "AAPL,GOOG,XOM"],
@@ -77,22 +92,7 @@
                 "RedirectOutput"
             ]
         },
-        {
-            "name": "Python Module",
-            "type": "python",
-            "request": "launch",
-            "stopOnEntry": true,
-            "pythonPath": "${config:python.pythonPath}",
-            "module": "module.name",
-            "cwd": "${workspaceRoot}",
-            "env": {},
-            "envFile": "${workspaceRoot}/.env",
-            "debugOptions": [
-                "WaitOnAbnormalExit",
-                "WaitOnNormalExit",
-                "RedirectOutput"
-            ]
-        },
+       
         {
             "name": "Trades CSV",
             "type": "python",

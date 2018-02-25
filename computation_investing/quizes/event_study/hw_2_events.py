@@ -1,7 +1,7 @@
 ## Computational Investing I
-## HW 2
+## HW 4
 ##
-## Author: alexcpsec
+## Author: Michael Schwab
 
 import pandas as pd
 import numpy as np
