@@ -20,7 +20,8 @@ class Test_Market_Sim(unittest.TestCase):
         # act
         result = process_orders(orders)
         # assert
-        self.assertIsNone(result)
+        self.assertIsNotNone(result)
+        print result.to_csv(index=False,header=True,columns=["year","month","day","portfolio"])
 
 if __name__ == "__main__":
     unittest.main()

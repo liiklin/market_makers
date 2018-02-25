@@ -1,0 +1,3 @@
+url, purpose
+https://ol-api1.openledger.info/api/v0/ol/support/trading-pairs, trading-pairs_list
+https://ol-api1.openledger.info/api/v0/ol/support/coins, coins_list
