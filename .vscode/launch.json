@@ -54,6 +54,40 @@
             ]
         },
         {
+            "name": "Python - effient frontier",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": true,
+            "pythonPath": "${config:python.pythonPath}",
+            "program": "${file}",
+            "cwd": "${fileDirname}",
+            "env": {},
+            "envFile": "${workspaceRoot}/.env",
+            "args":["--y", "2011", "--sf", "test.txt"],
+            "debugOptions": [
+                "WaitOnAbnormalExit",
+                "WaitOnNormalExit",
+                "RedirectOutput"
+            ]
+        },
+        {
+            "name": "Python - event study",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": true,
+            "pythonPath": "${config:python.pythonPath}",
+            "program": "${file}",
+            "cwd": "${fileDirname}",
+            "env": {},
+            "envFile": "${workspaceRoot}/.env",
+            "args":["--year", "2008", "--sym_file", "sp5002008.txt"],
+            "debugOptions": [
+                "WaitOnAbnormalExit",
+                "WaitOnNormalExit",
+                "RedirectOutput"
+            ]
+        },
+        {
             "name": "PySpark",
             "type": "python",
             "request": "launch",
