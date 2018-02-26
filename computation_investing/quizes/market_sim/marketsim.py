@@ -15,7 +15,8 @@ def similate_portfolio(initial_amount, df_orders, custom_enddate=None):
     Call simulate with the dict.
     Write the results to out-file.
     """
-    df_orders.columns = ["year","month","day","symbol","bs","amount","xx"]
+    #df_orders.columns = ["year","month","day","symbol","bs","amount","xx"]
+    df_orders.columns = ["year","month","day","symbol","bs","amount"]
     for c in ["symbol","bs"]:
         df_orders[c] = df_orders[c].map(str.strip)
 

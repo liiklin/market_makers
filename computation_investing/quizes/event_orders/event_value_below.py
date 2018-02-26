@@ -10,6 +10,7 @@ import copy
 import click
 import QSTK.qstkutil.qsdateutil as du
 import datetime as dt
+from  datetime import timedelta
 import QSTK.qstkutil.DataAccess as da
 import QSTK.qstkutil.tsutil as tsu
 import QSTK.qstkstudy.EventProfiler as ep
@@ -45,6 +46,7 @@ def load_data(ldt_timestamps, symbols_list):
         d_data[s_key] = d_data[s_key].fillna(1.0)
     return d_data
 
+def add_market_days()
 def find_events(ls_symbols, d_data, t_val):
     df_close = d_data['actual_close']
     ts_market = df_close['SPY']
@@ -67,10 +69,15 @@ def find_events(ls_symbols, d_data, t_val):
             if f_symprice_yest >= float(t_val) and f_symprice_today < float(t_val):
                 df_events[s_sym].ix[ldt_timestamps[i]] = 1
     event_rows = df_events.dropna(how="all")
-    
+    symbol_events = {}
+    for s_sym in ls_symbols:
+        events = df_events[s_sym].dropna(how="all")
+        if not events.empty:
+            symbol_events[s_sym] = events.index
+    df_events = pd.DataFrame(symbol_events)
     return df_events
 
-def find_events_vectorized(ls_symbols, d_data, t_val):
+def find_events_vectorized(ls_symbols, d_data, t_val, hold_days=5):
     print "Finding Events..."
     df_close = d_data['actual_close']
     ts_market = df_close['SPY']
@@ -81,21 +88,40 @@ def find_events_vectorized(ls_symbols, d_data, t_val):
         symprice_yesterday = df_close[s_sym].shift(-1)
         df_events[s_sym] = (df_close[s_sym] < t_val) & (symprice_yesterday >= t_val)
         df_events[s_sym] = df_events[s_sym][df_events[s_sym]]
-    return df_events
-
-def create_event_orders(df_events, days=5):
+    event_rows = df_events.dropna(how="all")
+    symbol_events = {}
+    event_series = pd.Series([])
+    dates = []
+    symbols = []
+    for s_sym in ls_symbols:
+        events = df_events[s_sym].dropna(how="all")
+        dates.extend(events.index)
+        symbols.extend([s_sym] * len(events.index))
+            
+    return pd.Series(symbols,dates).sort_index()
+    
+def create_event_orders(events, sell_days, hold_days=5, amount=100):
     """
     Create buy and sell orders for the detected events
     """
-    orders = []
-    symbol_events ={}
-    event_rows = df_events.dropna(how="all")
-    ls_symbols = df_events.columns
-    for symbol in ls_symbols:
-        events = event_rows[symbol] .dropna(how="all")
-        if not events.empty:
-            symbol_events[symbol] = events.index
-    df_sym_events = pd.DataFrame(events)
-    #df_.pivot()
-    #orders.append("Need to add some orders...")
-    return df_sym_events
+    
+    df_buy_events = pd.DataFrame(events, columns=["stock"], index=events.index)
+    df_buy_events["order"] ="Buy"
+    df_buy_events["year"] = events.index.year
+    df_buy_events["month"] = events.index.month
+    df_buy_events["day"] = events.index.day
+    df_buy_events["amount"] = 100
+    df_sell_events = pd.DataFrame(events,columns=["stock"])
+    df_sell_events.reset_index()
+    df_sell_events.index = sell_days[0:events.shape(0)]
+    #sell_days = df_sell_events.index + timedelta(days=hold_days)
+    df_sell_events["order"] ="Sell"
+    df_sell_events["year"] = df_sell_events.index.year
+    df_sell_events["month"] = df_sell_events.index.sell_days.month
+    df_sell_events["day"] = df_sell_events.index.sell_days.day
+    #df_sell_events.index = sell_days
+    df_sell_events["amount"] = 100
+
+    df_orders = df_sell_events.append(df_buy_events).sort_index()
+    return df_orders
+    

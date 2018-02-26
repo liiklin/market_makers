@@ -49,7 +49,7 @@ def process_orders(df_orders, initial_cash=10000,custom_enddate=None):
     dt_end = df_orders.index[-1] if custom_enddate is None else custom_enddate
     ldt_timestamps = du.getNYSEdays(dt_start, dt_end, dt.timedelta(hours=16))
     after_hrs_order_dates = np.setdiff1d(df_orders.index.tolist(), ldt_timestamps)
-    if after_hrs_order_dates:
+    if after_hrs_order_dates.any():
         ldt_timestamps.extend(after_hrs_order_dates)
     dataobj = da.DataAccess("Yahoo", verbose=False)
     ls_keys = ['open', 'high', 'low', 'close', 'volume', 'actual_close']
