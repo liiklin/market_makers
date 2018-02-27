@@ -14,3 +14,4 @@ tri_arbitrage/tri_arb
 *.5m
 objectdb
 *.fdb_latexmk
+.vscode/*
