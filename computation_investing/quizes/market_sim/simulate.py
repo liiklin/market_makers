@@ -25,7 +25,6 @@ def ignore_exception(IgnoreException=Exception,DefaultVal=None):
                 return DefaultVal
         return _dec
     return dec
-
     
 def get_close_prices(dt_start,dt_end, ls_symbols):
     dt_timeofday = dt.timedelta(hours=16)
@@ -34,7 +33,7 @@ def get_close_prices(dt_start,dt_end, ls_symbols):
     data = dataobj.get_data(ldt_timestamps, ls_symbols, ["close"])
     return data[0]
 
-def process_orders(df_orders, initial_cash=10000,custom_enddate=None):
+def process_orders(df_orders, initial_cash=10000.0,custom_enddate=None):
     if not isinstance(initial_cash, float):
         print ("initial_case must be a float")
         return None
@@ -61,7 +60,7 @@ def process_orders(df_orders, initial_cash=10000,custom_enddate=None):
     df_prices_close = d_data["close"]
     df_zeros = pd.DataFrame(0,ldt_timestamps, columns=ls_symbols)
     # drop any orders not on trading days
-    df_order_wrong_day = df_orders[~df_orders.index.isin(df_zeros.index)]
+    #df_order_wrong_day = df_orders[~df_orders.index.isin(df_zeros.index)]
     #print ("Dropping Orders on Market Closed Days...")
     #print (df_order_wrong_day)
     #df_orders.drop(df_order_wrong_day.index, inplace=True)

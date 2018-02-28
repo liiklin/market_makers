@@ -40,7 +40,7 @@ class TestSimulate(unittest.TestCase):
     def test_example_1(self):
         dt_start = datetime(2010,1,1)
         dt_end = datetime(2010, 12, 31)
-        symbols = ["APX","HPQ","IBM","HNZ"]'AAPL', 'GOOG', 'IBM', 'MSFT'
+        symbols = ["APX","HPQ","IBM","HNZ"]
         allocations = [0, 0, 0, 1]
         vol, daily_ret, sharpe, cum_ret = simulate.simulate(\
             dt_start, dt_end, symbols, allocations)
