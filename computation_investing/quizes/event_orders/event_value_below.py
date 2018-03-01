@@ -201,7 +201,8 @@ class EventOrders(object):
         # containing the trade values
         df_order_trades = df.combine_first(df_zeros)
         # Calculate the cash value of each trade using close prices
-        print "%s prices times %s trades " % (len(self.ls_data["close"]), df_order_trades.size(0))
+        print "%s prices times %s trades " % (len(self.ls_data["close"]), len(df_order_trades.index))
+        print "Missing indexes %s" % ( self.ls_data.index.)
         df_trade_values = df_order_trades * self.ls_data["close"]
         # Calculate the porfolio stock holdings for each day
         df_portfolio_holdings = df_order_trades.cumsum(axis=0)
