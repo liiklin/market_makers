@@ -158,7 +158,7 @@ class Price(Base):
     vol_zero = Column(Numeric)
     std_price = Column(Float)
     def __init__(self, exchange, currency_pair, timestamp, \
-        open=0, close=0, low=0, high=0, average=0, vol=0, std_price=0):
+        open=0, close=0, low=0, high=0, average=0, vol=0, std_price=0, datetime_hash=""):
         self.exchange = exchange
         self.currency_pair = currency_pair
         self.open = open
@@ -170,6 +170,7 @@ class Price(Base):
         self.vol_zero = 1 if self.vol == 0 else 0
         self.std_price = std_price
         self.timestamp = timestamp
+        self.datetime_hash = datetime_hash
     def as_dict(self):
         return self.__dict__
 

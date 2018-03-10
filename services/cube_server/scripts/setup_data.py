@@ -41,6 +41,7 @@ def load_file(path):
     else:
         print "%s file not found" % (path)
     return None
+
 def is_valid_data_dict(data, required_fields):
         if not data or not isinstance(data, dict):
             repo.logger.warn("Called with invalid data, must be a dict and have the keys %s", required_keys)
@@ -306,6 +307,7 @@ class CloseDateRepoSession(OrderedWorker):
             DateRepo.session = None
             lb = LoggingBase(config_provider=get_config_provider())
             lb.logger.info("Closed Currency Pair Sessions")
+            
 class ClosePriceRepoSession(OrderedWorker):
     def doTask(self, data):
         if PriceRepository.active_session:
